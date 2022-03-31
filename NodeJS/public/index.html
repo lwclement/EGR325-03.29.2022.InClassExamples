@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>Weather Widgets</title>
+
+<style>
+
+</style>
+
+<script src="js/jquery.min.js"></script><!--jquery-->
+<script src="js/svgchart.js"></script><!--jquery chart plugin -->
+
+<script>
+
+var temp = [0];
+var humidity = [0];
+
+$(function(){
+
+
+	function loadAndChartData(){
+	
+		var jqxhr = $.get("/weather", function(data) {
+		
+			temp.push(data.temp);
+			if (temp.length > 30){temp.shift();} // removes the first data point on plots longer than 30...
+			humidity.push(data.humidity);
+			if (humidity.length > 30){humidity.shift();} // removes the first data point on plots longer than 30...
+			
+			
+			$("#temp").chartData({//calls the jQuery chart plugin with parameters. See the svgchart.js for details
+				viewWidth : 800,
+				viewHeight: 200,
+				margin: 10,
+				yLabels : 5,
+				data:temp
+			
+			});
+						
+			$("#humid").chartData({ //calls the jQuery chart plugin with parameters. See the svgchart.js for details
+				viewWidth : 800,
+				viewHeight: 200,
+				margin: 10,
+				yLabels : 5,
+				data:humidity
+			
+			});
+		
+			setTimeout(function(){ loadAndChartData(); }, 1000); //polls for new data every 1000 miliseconds (1 second)
+		});	
+ 	}
+
+	setTimeout(function(){ loadAndChartData(); }, 1000); //starts polling
+
+
+})
+
+</script>
+
+</head>
+
+<body>
+<h2>Temperature<h2>
+<div id="temp">
+</div>
+<h2>Humidity</h2>
+<div id="humid">
+</div>
+</body>
+
+</html>
